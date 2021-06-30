@@ -27,21 +27,35 @@ namespace HarryPotterMemoryGame
         int index = 0;
 
         Random rand;
+        private bool frontLayerMade;
+
         public GameForm()
         {
             InitializeComponent();
+            InitializeGameObjects();
 
-            rand = new Random(Guid.NewGuid().GetHashCode());
-
-            CreatePictureGrid();
-            CreateQuestionMarkGRid();
-         
+          
         }
 
-        public void CreatePictureGrid()
+        public void InitializeGameObjects()
         {
+            rand = new Random(Guid.NewGuid().GetHashCode());
+
+            QuestionGrid = new PictureBox[Rows, Columns];
+
+            QuestionMarks = new List<PictureBox>() {pictureBox1q, pictureBox2q,
+                pictureBox3q, pictureBox4q, pictureBox5q, pictureBox6q,
+                pictureBox7q, pictureBox8q, pictureBox9q, pictureBox10q,
+                pictureBox11q, pictureBox12q, pictureBox13q, pictureBox14q,
+                 pictureBox15q, pictureBox16q };
+
+            foreach (PictureBox question in QuestionMarks)
+            {
+                question.MouseClick += new MouseEventHandler(Question_MouseClick);
+            }
+
             PictureGrid = new PictureBox[Rows, Columns];
-            
+
             PicStrings = new string[Rows, Columns];
 
             Images = new List<PictureBox>() {pictureBox1, pictureBox2,
@@ -59,46 +73,27 @@ namespace HarryPotterMemoryGame
              "draco", "draco2", "hagrid", "hagrid2", "dumble", "dumble2", "mgoni", "mgoni2" };
 
             ImageFileStrings = ImageFileStrings.OrderBy(x => rand.Next()).ToList();
-
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Columns; j++)
-                {
-                    PictureGrid[i, j] = Images[0];
-                    Images.RemoveAt(0);
-                    PicStrings[i, j] = ImageFileStrings[0];
-                    ImageFileStrings.RemoveAt(0);
-
-                    PictureGrid[i, j].Image = (Image)Properties.Resources.ResourceManager.GetObject(PicStrings[i, j]);
-                }
-            }
         }
 
-
-        public void CreateQuestionMarkGRid()
+        public void PopulatePictureGrid(List<PictureBox> picBoxlist, PictureBox[,] grid, int rows, int columns)
         {
-            QuestionGrid = new PictureBox[Rows, Columns];
-
-            QuestionMarks = new List<PictureBox>() {pictureBox1q, pictureBox2q,
-                pictureBox3q, pictureBox4q, pictureBox5q, pictureBox6q,
-                pictureBox7q, pictureBox8q, pictureBox9q, pictureBox10q,
-                pictureBox11q, pictureBox12q, pictureBox13q, pictureBox14q,
-                 pictureBox15q, pictureBox16q };
-
-            foreach (PictureBox question in QuestionMarks)
+            for (int i = 0; i < rows; i++)
             {
-                question.MouseClick += new MouseEventHandler(Question_MouseClick);
-            }
-
-            for (int i = 0; i < Rows; i++)
-            {
-                for (int j = 0; j < Columns; j++)
+                for (int j = 0; j < columns; j++)
                 {
-                    
-                    QuestionGrid[i, j] = QuestionMarks[index];
-                    index++;
 
-                    QuestionGrid[i, j].Image = (Image)Properties.Resources.ResourceManager.GetObject("question");
+                    grid[i, j] = picBoxlist[index];
+                    index++;
+                    grid[i, j].Image = (Image)Properties.Resources.ResourceManager.GetObject("question");
+
+                    frontLayerMade = true;
+                    
+                    if (frontLayerMade)
+                    {
+                        grid[i, j] = picBoxlist[index];
+                        index++;
+                        grid[i, j].Image = (Image)Properties.Resources.ResourceManager.GetObject(ImageFileStrings.ElementAt(index));
+                    }
                 }
             }
         }
